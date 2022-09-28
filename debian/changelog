@@ -1,0 +1,254 @@
+blis (0.8.1-2) unstable; urgency=medium
+
+  * Upload to unstable.
+
+ -- Mo Zhou <lumin@debian.org>  Fri, 03 Sep 2021 23:16:38 -0400
+
+blis (0.8.1-1) experimental; urgency=medium
+
+  * New upstream version 0.8.1
+  * Refresh existing patches.
+
+ -- Mo Zhou <lumin@debian.org>  Sat, 08 May 2021 13:27:19 +0800
+
+blis (0.8.0-1) unstable; urgency=medium
+
+  * New upstream version 0.8.0 (Nov 2020)
+  * Explicit configurations in descriptions for disambiguity.
+  * Refresh patches and symbols control file (amd64).
+  * Bump debhelper compat level to 13.
+
+ -- Mo Zhou <lumin@debian.org>  Sun, 22 Nov 2020 09:46:47 +0800
+
+blis (0.7.0-1) unstable; urgency=medium
+
+  * New upstream version 0.7.0
+  * Refresh patches without change.
+
+ -- Mo Zhou <lumin@debian.org>  Tue, 14 Apr 2020 21:12:37 +0800
+
+blis (0.6.1-2) unstable; urgency=medium
+
+  * Refresh symbols control files for arm64,i386 and generic.
+  * Skip dh_auto_test for hurd-i386 architecture.
+  * Upload to unstable.
+
+ -- Mo Zhou <lumin@debian.org>  Thu, 13 Feb 2020 10:26:20 +0800
+
+blis (0.6.1-1) experimental; urgency=medium
+
+  * New upstream version 0.6.1
+  * Bump SOVER from 2 to 3 following upstream.
+  * Refresh symbol control files.
+  * Breaks & Replaces lib packages with old SOVERSION.
+  * Specify Rules-Requires-Root: no.
+  * Update my mail address in control and copyright.
+  * Upload to experimental.
+
+ -- Mo Zhou <lumin@debian.org>  Tue, 04 Feb 2020 13:07:59 +0800
+
+blis (0.6.0-3) unstable; urgency=medium
+
+  * Change priority of O,P,S variants to 80,75,70 respectively.
+  * Bump Standards-Version to 4.4.1 (no change).
+  * Deprecate d/compat and B-D on debhelper-compat instead.
+
+ -- Mo Zhou <cdluminate@gmail.com>  Sun, 24 Nov 2019 14:29:27 +0800
+
+blis (0.6.0-2) unstable; urgency=medium
+
+  * Upload to unstable.
+
+ -- Mo Zhou <cdluminate@gmail.com>  Mon, 08 Jul 2019 06:10:27 +0000
+
+blis (0.6.0-1) experimental; urgency=medium
+
+  [ Nico Schlömer ]
+  * fix typo
+
+  [ Mo Zhou ]
+  * New upstream version 0.6.0
+  * Refresh symbols control file.
+
+ -- Mo Zhou <cdluminate@gmail.com>  Sun, 23 Jun 2019 05:56:36 +0000
+
+blis (0.5.2-7) experimental; urgency=medium
+
+  * Also install documentations to the meta -dev packages.
+  * Register the markdown documentations in doc-base.
+  * Don't mangle name of BLIS's cblas.h header to cblas-blis.h
+  * Append CPPFLAGS to CFLAGS, fixing shared object hardening.
+  * Add Build-Depends-Package field in symbol files.
+  * Remove unused lintian overrides.
+
+ -- Mo Zhou <cdluminate@gmail.com>  Mon, 15 Apr 2019 05:41:11 +0000
+
+blis (0.5.2-6) experimental; urgency=medium
+
+  * Install the automatically generated makefiles for each variant.
+  * Autopkgtest: Test BLIS with ./testsuite, remove some old tests.
+
+ -- Mo Zhou <cdluminate@gmail.com>  Sun, 14 Apr 2019 09:01:59 +0000
+
+blis (0.5.2-5) experimental; urgency=medium
+
+  * Fixup the version script and really hide all bli_* symbols for
+    libblas.so.3; Update symbol control files accordingly.
+  * Use more variables in d/rules for u-a priority values.
+  * Properly guard the test_% target with "nocheck" detector.
+
+ -- Mo Zhou <cdluminate@gmail.com>  Sun, 14 Apr 2019 03:34:22 +0000
+
+blis (0.5.2-4) experimental; urgency=medium
+
+  * Make short and long descriptions different for every variant.
+  * Remove unused debian/source/lintian-overrides.
+  * Collect libblas.so.3 symbols updates from buildd for all archs.
+  * Compile on kfreebsd-amd64 with X86_64 configuration.
+
+ -- Mo Zhou <cdluminate@gmail.com>  Sat, 13 Apr 2019 16:06:56 +0000
+
+blis (0.5.2-3) experimental; urgency=medium
+
+  * Provide dependency templates for libblas{,64}.so.3 (Closes: #926909)
+  * README.Source: Add some memo about the package detail.
+
+ -- Mo Zhou <cdluminate@gmail.com>  Sat, 13 Apr 2019 12:47:46 +0000
+
+blis (0.5.2-2) experimental; urgency=medium
+
+  * Refresh symbols for i386, x32 and arm64.
+
+ -- Mo Zhou <cdluminate@gmail.com>  Fri, 22 Mar 2019 06:43:21 +0000
+
+blis (0.5.2-1) experimental; urgency=medium
+
+  * New upstream version 0.5.2
+  * Add missing B-D to autopkgtest control and add test names.
+  * Remove patches merged by upstream, Refresh remaining patches.
+  * Fixup symlinks for BLIS64 symbols lists.
+  * Refresh BLIS/BLIS64 symbols list for amd64 and generic (ppc64el).
+
+ -- Mo Zhou <cdluminate@gmail.com>  Thu, 21 Mar 2019 03:33:26 +0000
+
+blis (0.5.1-11) unstable; urgency=medium
+
+  * Add version script for libblas.so.3 to export only {C,}BLAS ABI.
+  * Add test-name feature to Autopkgtest control file.
+    And remove unnecessary test cases.
+  * Update lintian overrides.
+  * Add upstream/metadata file.
+
+ -- Mo Zhou <cdluminate@gmail.com>  Wed, 06 Feb 2019 08:43:40 +0000
+
+blis (0.5.1-10) unstable; urgency=medium
+
+  * Correct BLIS64 alternative name: libblis64.so.@SOVER@-@DEB_HOST_MULTIARCH@
+
+ -- Mo Zhou <cdluminate@gmail.com>  Tue, 05 Feb 2019 03:36:17 +0000
+
+blis (0.5.1-9) unstable; urgency=medium
+
+  * Add Restrictions: needs-root to maintainer-script autopkgtest cases.
+  * Rename libblis{,64-}2-symbols.* to libblis{,64-}2-XXX.symbols.*
+  * Rewrite the shell loop for creating symlinks for symbols files.
+  * Guard test targets with nocheck detector in rules.
+
+ -- Mo Zhou <cdluminate@gmail.com>  Tue, 05 Feb 2019 02:35:23 +0000
+
+blis (0.5.1-8) unstable; urgency=medium
+
+  * Make all BLIS variants co-installable. (Closes: #919272)
+    + Move all shlibs and headers to private directories.
+    + Rewrite libblis2-openmp.{postinst,prerm} into common templates.
+    + Rewrite libblis64-2-openmp.{postinst,prerm} into common templates.
+    + Rewrite libblis-openmp-dev.{postinst,prerm} into common templates.
+    + Rewrite libblis64-openmp-dev.{postinst,prerm} into common templates.
+    + Add libblis{,64}.a as slave links for libblis.so.
+    + Generate maintainer scripts from templates.
+    - Remove all Conflicts relationship between BLIS variants.
+  * Virtual Package / Provides updates:
+    - libblas{,64}.so   is no longer provided by libblis{,64}-dev.
+    - libblas{,64}.so.3 is no longer provided by libblis{,64-}2.
+    + libblis-{...}-dev   Provides libblis.so,     libblas.so
+    + libblis2-{...}      Provides libblis.so.2,   libblas.so.3
+    + libblis64-{...}-dev Provides libblis64.so,   libblas64.so
+    + libblis64-2-{...}   Provides libblis64.so.2, libblas64.so.3
+  * Autopkgtest Updates:
+    + Add test cases for maintainer scripts.
+    + Run libblas-test against all BLIS variants.
+
+ -- Mo Zhou <cdluminate@gmail.com>  Mon, 04 Feb 2019 06:14:56 +0000
+
+blis (0.5.1-7) unstable; urgency=medium
+
+  * Modify upstream header to amend kFreeBSD detection.
+  * Patch upstream Makefile to build separate libblas.so* .
+  * Install separate libblas into blis{,64} subdirs, (Closes: #919273)
+    where its SONAME is "libblas.so.3".
+  * Change libblas.so* provider from libblis.so* to blis*/libblas.so*.
+  * Override dh_dwz to append --no-dwz-multifile option.
+  * Don't track symbols list for private shared objects.
+
+ -- Mo Zhou <cdluminate@gmail.com>  Sun, 27 Jan 2019 06:18:53 +0000
+
+blis (0.5.1-6) unstable; urgency=medium
+
+  * Cherry-pick upstream commit to fix configure on kfreebsd.
+
+ -- Mo Zhou <cdluminate@gmail.com>  Tue, 22 Jan 2019 14:35:38 +0000
+
+blis (0.5.1-5) unstable; urgency=medium
+
+  * Use generic kernel for armel,armhf architectures. (Closes: #919710)
+
+ -- Mo Zhou <cdluminate@gmail.com>  Sat, 19 Jan 2019 02:39:44 +0000
+
+blis (0.5.1-4) unstable; urgency=medium
+
+  * Fix the problematic patch for Hurd.
+
+ -- Mo Zhou <cdluminate@gmail.com>  Thu, 17 Jan 2019 05:02:27 +0000
+
+blis (0.5.1-3) unstable; urgency=medium
+
+  * Run fast version of test on all architectures.
+  * Add patch to port BLIS to GNU Hurd OS.
+
+ -- Mo Zhou <cdluminate@gmail.com>  Thu, 17 Jan 2019 04:43:00 +0000
+
+blis (0.5.1-2) unstable; urgency=medium
+
+  * Bump debhelper compat to 12.
+  * Bump Standards-Version to 4.3.0 (no change).
+  * Let libblis-dev (instead of libblis-*-dev) provide libblas.so.
+  * Change (arm32,arm64) targets into (cortexa15,cortexa57).
+  * Refresh symbols control file for arm64 and armhf.
+  * Autopkgtest Depends on build-essential instead of merely gcc.
+
+ -- Mo Zhou <cdluminate@gmail.com>  Wed, 16 Jan 2019 12:20:46 +0000
+
+blis (0.5.1-1) unstable; urgency=medium
+
+  * New upstream version 0.5.1
+  * Add version condition to dependencies of libblis-1 and libblis64-1.
+  * Collect symbol patches for various architectures from buildd.
+  * Bump SOVERSION from 1 to 2, and SONAME to libblis.so.2
+  * Overhaul d/rules for the SOVERSION bump and auto symlink creation.
+    - Remove all symlinks under debian directory.
+  * Remove all patches, problems fixed upstream.
+  * Export a proper PYTHON variable for upstream build system.
+  * Update dependency-template in symbols control file, stripping the
+    threadding identifier postfix.
+  * Override symbols-declares-dependency-on-other-package on shlib packages.
+    The dependency template should really be libblis2 (meta) or
+    libblis64-2 (meta) instead of a specific backend used during build.
+  * Add autopkgtest control file with 6 test cases.
+
+ -- Mo Zhou <cdluminate@gmail.com>  Thu, 03 Jan 2019 11:36:29 +0000
+
+blis (0.5.0-1) unstable; urgency=low
+
+  * Initial upload based on Nico Schlömer's work. (Closes: #909457)
+
+ -- Mo Zhou <cdluminate@gmail.com>  Tue, 18 Dec 2018 03:13:26 +0000

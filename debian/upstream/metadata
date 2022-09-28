@@ -1,0 +1,13 @@
+Name: BLIS
+Bug-Database: https://github.com/flame/blis/issues
+Bug-Submit: https://github.com/flame/blis/issues
+Reference:
+ Author: Field G. {V}an~{Z}ee and Robert A. {v}an~{d}e~{G}eijn
+ Title: "BLIS: A Framework for Rapidly Instantiating BLAS Functionality"
+ Journal: ACM Transactions on Mathematical Software
+ Volume: 41
+ Number: 3
+ Pages: 14:1--14:33
+ Year: 2015
+ URL: "http://doi.acm.org/10.1145/2764454"
+Repository: https://github.com/flame/blis

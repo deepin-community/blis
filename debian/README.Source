@@ -1,0 +1,30 @@
+Notes
+=====
+
+There are just too many details in the BLIS (One of the BLAS Family)
+packaging. To make sure I won't forget all of them in the future,
+this note had been written.
+
+* bin:libblis2-.*'s symbol files should not use the default template,
+  which generates dependency informations such as
+
+    libblis.so.2 libblis2-openmp #MINVER#
+    ...
+
+  which is clearly incorrect ... the main-dependency-template should
+  be "libblis2" (a meta package to be satisfied by one of the three
+  variants).
+
+  And DON'T forget to register the private libblas.so.3 !
+
+    libblas.so.3 libblas3 | libblas.so.3 #MINVER#
+
+* bin:libblis64-2-*'s symbol files should not use the default tepmlate,
+  neither. The dependency template should be
+
+    libblis64-2 | libblas64.so.3
+
+  BLAS64 users often have special demands. So when a package is built
+  against BLIS64, it should depend on libblis64-2 first.
+
+[1] Man: dpkg-symbols(5)

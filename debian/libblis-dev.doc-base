@@ -1,0 +1,7 @@
+Document: blis
+Title: BLIS Documentation
+Author: BLIS Authors
+Section: Science/Mathematics
+
+Format: Text
+Files: /usr/share/doc/libblis-dev/*.md.gz

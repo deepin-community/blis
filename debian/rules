@@ -1,0 +1,209 @@
+#!/usr/bin/make -f
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+export PYTHON=/usr/bin/python3  # for the upstream build system
+
+# Select target architecture
+# armhf: upstream's armv7a kernel assumes NEON. Using generic kernels currently.
+CONFIG_amd64      = x86_64
+CONFIG_arm64      = cortexa57
+CONFIG_ppc64el    = generic
+CONFIG_kfreebsd-amd64 = x86_64
+CONFIG            = $(word 1, $(CONFIG_$(DEB_HOST_ARCH)) generic)
+
+# Update-Alternatives Priority Settings
+UAPRI_O = 80
+UAPRI_P = 75
+UAPRI_S = 70
+
+# SOVERSION (Following upstream)
+SOVER := 3
+
+# Threading + Indexing Flavours
+ifneq (,$(filter $(DEB_HOST_ARCH), amd64 kfreebsd-amd64 arm64 mips64el ppc64el s390x ppc64 riscv64 sparc64))
+FLAVORS := $(SOVER)-openmp $(SOVER)-pthread $(SOVER)-serial 64-$(SOVER)-openmp 64-$(SOVER)-pthread 64-$(SOVER)-serial
+else
+FLAVORS := $(SOVER)-openmp $(SOVER)-pthread $(SOVER)-serial
+endif
+
+# Common flags for every variant
+FLAGS := \
+	--enable-verbose-make \
+	--prefix=/usr \
+	--enable-cblas \
+	--enable-static \
+	--enable-shared \
+	--libdir=/usr/lib/$(DEB_HOST_MULTIARCH)
+
+# FLAG Tweaks
+export CFLAGS = $(filter-out -O2, $(shell dpkg-buildflags --get CFLAGS)) \
+               $(shell dpkg-buildflags --get CPPFLAGS)
+
+##
+SRCS := $(filter-out debian $(FLAVORS), $(wildcard ./*))
+
+##
+
+
+%:
+	dh $@ -Smakefile
+
+create_symlinks:
+	# BLIS/BLAS
+	set -e; cd debian; for j in openmp pthread serial; do \
+		ln -sr libblis$(SOVER)-XXX.symbols.generic libblis$(SOVER)-$$j.symbols ;\
+		for i in kfreebsd-amd64 amd64 arm64; do  \
+			ln -sr libblis$(SOVER)-XXX.symbols.$$i libblis$(SOVER)-$$j.symbols.$$i ;\
+		done;\
+		for i in i386 x32; do \
+			ln -sr libblis$(SOVER)-XXX.symbols.i386 libblis$(SOVER)-$$j.symbols.$$i ;\
+		done;\
+	done;
+	# BLIS64/BLAS64
+	set -e; cd debian; for j in openmp pthread serial; do \
+		ln -sr libblis64-$(SOVER)-XXX.symbols.generic libblis64-$(SOVER)-$$j.symbols ;\
+		for i in kfreebsd-amd64 amd64 arm64; do \
+			ln -sr libblis64-$(SOVER)-XXX.symbols.$$i libblis64-$(SOVER)-$$j.symbols.$$i ;\
+		done;\
+	done;
+
+config_%:
+	# Generate maintainer scripts from templates
+	set -e; cd debian; if test -z "$$(echo $* | grep 64)"; then \
+		cp libblis$(SOVER)-XXX.postinst     libblis$*.postinst; \
+		cp libblis$(SOVER)-XXX.prerm        libblis$*.prerm; \
+		cp libblis-XXX-dev.postinst  libblis$(subst $(SOVER),,$*)-dev.postinst; \
+		cp libblis-XXX-dev.prerm     libblis$(subst $(SOVER),,$*)-dev.prerm; \
+		for SCRIPT in libblis$*.postinst libblis$*.prerm \
+			libblis$(subst $(SOVER),,$*)-dev.postinst \
+			libblis$(subst $(SOVER),,$*)-dev.prerm; do \
+			sed -i -e "s/@DEB_HOST_MULTIARCH@/$(DEB_HOST_MULTIARCH)/g" \
+				-e "s/@SUBDIR@/blis$(subst $(SOVER),,$*)/g" \
+				-e "s/@SOVER@/$(SOVER)/g" \
+				$$SCRIPT; \
+			if test -n "$$(echo $* | grep openmp)"; then \
+				sed -i -e "s/@BLIS_PRI@/$(UAPRI_O)/g" $$SCRIPT; \
+			elif test -n "$$(echo $* | grep pthread)"; then \
+				sed -i -e "s/@BLIS_PRI@/$(UAPRI_P)/g" $$SCRIPT; \
+			else \
+				sed -i -e "s/@BLIS_PRI@/$(UAPRI_S)/g" $$SCRIPT; \
+			fi; \
+		done; \
+	else \
+		cp libblis64-$(SOVER)-XXX.postinst     libblis$*.postinst; \
+		cp libblis64-$(SOVER)-XXX.prerm        libblis$*.prerm; \
+		cp libblis64-XXX-dev.postinst   libblis$(subst $(SOVER)-,,$*)-dev.postinst; \
+		cp libblis64-XXX-dev.prerm      libblis$(subst $(SOVER)-,,$*)-dev.prerm; \
+		for SCRIPT in libblis$*.postinst libblis$*.prerm \
+			libblis$(subst $(SOVER)-,,$*)-dev.postinst \
+			libblis$(subst $(SOVER)-,,$*)-dev.prerm; do \
+			sed -i -e "s/@DEB_HOST_MULTIARCH@/$(DEB_HOST_MULTIARCH)/g" \
+				-e "s/@SUBDIR@/blis$(subst $(SOVER)-,,$*)/g" \
+				-e "s/@SOVER@/$(SOVER)/g" \
+				$$SCRIPT; \
+			if test -n "$$(echo $* | grep openmp)"; then \
+				sed -i -e "s/@BLIS_PRI@/$(UAPRI_O)/g" $$SCRIPT; \
+			elif test -n "$$(echo $* | grep pthread)"; then \
+				sed -i -e "s/@BLIS_PRI@/$(UAPRI_P)/g" $$SCRIPT; \
+			else \
+				sed -i -e "s/@BLIS_PRI@/$(UAPRI_S)/g" $$SCRIPT; \
+			fi; \
+		done; \
+	fi;
+	# Run upstream configure script in duplicated source root directories
+	mkdir $*
+	cp -r $(SRCS) $*/
+	set -e; cd $*; if test -z "$$(echo $* | grep 64)"; then \
+		if test -z "$$(echo $* | grep serial)"; then \
+			./configure $(FLAGS) -t $(subst $(SOVER)-,,$*) $(CONFIG); \
+		else \
+			./configure $(FLAGS) --disable-threading $(CONFIG); \
+		fi; \
+		echo "$*/usr/lib/*/libblis.so.* usr/lib/$(DEB_HOST_MULTIARCH)/" > \
+			debian/libblis$*.install; \
+	else \
+		if test -z "$$(echo $* | grep serial)"; then \
+			./configure $(FLAGS) -b 64 -i 64 -t $(subst 64-$(SOVER)-,,$*) $(CONFIG); \
+		else \
+			./configure $(FLAGS) -b 64 -i 64 --disable-threading $(CONFIG); \
+		fi; \
+		echo "$*/usr/lib/*/libblis64.so.* usr/lib/$(DEB_HOST_MULTIARCH)/" > \
+			debian/libblis$*.install; \
+	fi;
+
+override_dh_auto_configure: $(addprefix config_, $(FLAVORS)) create_symlinks
+	:
+
+build_%:
+	set -e; if test -n "$$(echo $* | grep 64)"; then \
+		dh_auto_build -B$* -- DEB_LIBBLAS=libblas64.so.3 LIBBLIS=libblis64 ; \
+	else \
+		dh_auto_build -B$* -- DEB_LIBBLAS=libblas.so.3; \
+	fi;
+
+override_dh_auto_build: $(addprefix build_, $(FLAVORS))
+	:
+
+test_%:
+ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
+	set -e; if test -n "$$(echo $* | grep 64)"; then \
+		$(MAKE) -C$* check LIBBLIS=libblis64; \
+	else \
+		$(MAKE) -C$* check; \
+	fi;
+else
+	true  # Or Make won't be able to find the test_% target.
+endif
+
+ifeq (,$(filter hurd-i386,$(DEB_HOST_ARCH)))
+override_dh_auto_test: $(addprefix test_, $(FLAVORS))
+	:
+else
+override_dh_auto_test:
+	:
+endif
+
+install_%:
+	# Don't use the debian/tmp directory
+	-$(RM) -rf debian/tmp/*
+	# In case we forgot to compile something
+	-set -e; if test -n "$$(echo $* | grep 64)"; then \
+		dh_auto_install -B$* -- LIBBLIS=libblis64; \
+	else \
+		dh_auto_install -B$*; \
+	fi;
+	# Don't use the debian/tmp directory
+	-$(RM) -rf debian/tmp/*
+
+	# Install things manually
+	set -e; if test -z "$$(echo $* | grep 64)"; then \
+		install -Dm0644 $*/lib/*/libblis.so     debian/libblis$*/usr/lib/$(DEB_HOST_MULTIARCH)/blis$(subst $(SOVER),,$*)/libblis.so.$(SOVER) ;\
+		install -Dm0644 $*/lib/*/libblas.so.3   debian/libblis$*/usr/lib/$(DEB_HOST_MULTIARCH)/blis$(subst $(SOVER),,$*)/libblas.so.3 ;\
+		ln -s libblas.so.3                      debian/libblis$*/usr/lib/$(DEB_HOST_MULTIARCH)/blis$(subst $(SOVER),,$*)/libblas.so ;\
+		install -Dm0644 $*/lib/*/libblis.a      debian/libblis$(subst $(SOVER),,$*)-dev/usr/lib/$(DEB_HOST_MULTIARCH)/blis$(subst $(SOVER),,$*)/libblis.a ;\
+		ln -s libblis.so.$(SOVER)               debian/libblis$(subst $(SOVER),,$*)-dev/usr/lib/$(DEB_HOST_MULTIARCH)/blis$(subst $(SOVER),,$*)/libblis.so ;\
+		install -Dm0644 $*/include/*/blis.h     debian/libblis$(subst $(SOVER),,$*)-dev/usr/include/$(DEB_HOST_MULTIARCH)/blis$(subst $(SOVER),,$*)/blis.h ;\
+		install -Dm0644 $*/include/*/cblas.h    debian/libblis$(subst $(SOVER),,$*)-dev/usr/include/$(DEB_HOST_MULTIARCH)/blis$(subst $(SOVER),,$*)/cblas.h ;\
+		mkdir -p            debian/libblis$(subst $(SOVER),,$*)-dev/usr/share/blis$(subst $(SOVER),,$*)-$(DEB_HOST_MULTIARCH)/config/$(CONFIG)/;\
+		cp -v $*/common.mk  debian/libblis$(subst $(SOVER),,$*)-dev/usr/share/blis$(subst $(SOVER),,$*)-$(DEB_HOST_MULTIARCH)/;\
+		cp -v $*/config.mk  debian/libblis$(subst $(SOVER),,$*)-dev/usr/share/blis$(subst $(SOVER),,$*)-$(DEB_HOST_MULTIARCH)/;\
+		cp -v config/$(CONFIG)/make_defs.mk debian/libblis$(subst $(SOVER),,$*)-dev/usr/share/blis$(subst $(SOVER),,$*)-$(DEB_HOST_MULTIARCH)/config/$(CONFIG)/;\
+	else \
+		install -Dm0644 $*/lib/*/libblis64.so   debian/libblis$*/usr/lib/$(DEB_HOST_MULTIARCH)/blis$(subst $(SOVER)-,,$*)/libblis64.so.$(SOVER) ;\
+		install -Dm0644 $*/lib/*/libblas64.so.3 debian/libblis$*/usr/lib/$(DEB_HOST_MULTIARCH)/blis$(subst $(SOVER)-,,$*)/libblas64.so.3 ;\
+		ln -s libblas64.so.3                    debian/libblis$*/usr/lib/$(DEB_HOST_MULTIARCH)/blis$(subst $(SOVER)-,,$*)/libblas64.so ;\
+		install -Dm0644 $*/lib/*/libblis64.a    debian/libblis$(subst $(SOVER)-,,$*)-dev/usr/lib/$(DEB_HOST_MULTIARCH)/blis$(subst $(SOVER)-,,$*)/libblis64.a ;\
+		ln -s libblis64.so.$(SOVER)             debian/libblis$(subst $(SOVER)-,,$*)-dev/usr/lib/$(DEB_HOST_MULTIARCH)/blis$(subst $(SOVER)-,,$*)/libblis64.so ;\
+		install -Dm0644 $*/include/*/blis.h     debian/libblis$(subst $(SOVER)-,,$*)-dev/usr/include/$(DEB_HOST_MULTIARCH)/blis$(subst $(SOVER)-,,$*)/blis64.h ;\
+		install -Dm0644 $*/include/*/cblas.h    debian/libblis$(subst $(SOVER)-,,$*)-dev/usr/include/$(DEB_HOST_MULTIARCH)/blis$(subst $(SOVER)-,,$*)/cblas64.h ;\
+		mkdir -p             debian/libblis$(subst $(SOVER)-,,$*)-dev/usr/share/blis$(subst $(SOVER)-,,$*)-$(DEB_HOST_MULTIARCH)/config/$(CONFIG)/;\
+		cp -v $*/common.mk  debian/libblis$(subst $(SOVER)-,,$*)-dev/usr/share/blis$(subst $(SOVER)-,,$*)-$(DEB_HOST_MULTIARCH);\
+		cp -v $*/config.mk  debian/libblis$(subst $(SOVER)-,,$*)-dev/usr/share/blis$(subst $(SOVER)-,,$*)-$(DEB_HOST_MULTIARCH);\
+		cp -v config/$(CONFIG)/make_defs.mk debian/libblis$(subst $(SOVER)-,,$*)-dev/usr/share/blis$(subst $(SOVER)-,,$*)-$(DEB_HOST_MULTIARCH)/config/$(CONFIG)/;\
+	fi;
+
+override_dh_auto_install: $(addprefix install_, $(FLAVORS))
+	# Don't use the debian/tmp directory
+	-$(RM) -rf debian/tmp/*
+
+override_dh_dwz:
+	dh_dwz --no-dwz-multifile

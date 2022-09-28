@@ -1,0 +1,26 @@
+#!/bin/sh
+set -e
+. /usr/share/debconf/confmodule
+blis_pri=@BLIS_PRI@
+
+update-alternatives --install /usr/lib/@DEB_HOST_MULTIARCH@/libblis.so \
+                    libblis.so-@DEB_HOST_MULTIARCH@ \
+                    /usr/lib/@DEB_HOST_MULTIARCH@/@SUBDIR@/libblis.so \
+                    $blis_pri \
+                    --slave /usr/include/@DEB_HOST_MULTIARCH@/blis.h \
+                    blis.h-@DEB_HOST_MULTIARCH@ \
+                    /usr/include/@DEB_HOST_MULTIARCH@/@SUBDIR@/blis.h \
+                    --slave /usr/lib/@DEB_HOST_MULTIARCH@/libblis.a \
+                    libblis.a-@DEB_HOST_MULTIARCH@ \
+                    /usr/lib/@DEB_HOST_MULTIARCH@/@SUBDIR@/libblis.a
+
+update-alternatives --install /usr/lib/@DEB_HOST_MULTIARCH@/libblas.so \
+                    libblas.so-@DEB_HOST_MULTIARCH@ \
+                    /usr/lib/@DEB_HOST_MULTIARCH@/@SUBDIR@/libblas.so \
+                    $blis_pri \
+                    --slave /usr/include/@DEB_HOST_MULTIARCH@/cblas.h \
+                    cblas.h-@DEB_HOST_MULTIARCH@ \
+                    /usr/include/@DEB_HOST_MULTIARCH@/@SUBDIR@/cblas.h
+
+#DEBHELPER#
+exit 0

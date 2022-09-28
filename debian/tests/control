@@ -1,0 +1,43 @@
+# ---------------- BLIS testsuite ---------------------------------------------
+
+Test-Command: cd testsuite; sh ../debian/tests/blis-testsuite.sh blis-openmp
+Restrictions: allow-stderr,
+Depends: libblis-openmp-dev, build-essential,
+Features: test-name=blis32-openmp-test
+
+Test-Command: cd testsuite; sh ../debian/tests/blis-testsuite.sh blis-pthread
+Restrictions: allow-stderr,
+Depends: libblis-pthread-dev, build-essential,
+Features: test-name=blis32-pthread-test
+
+Test-Command: cd testsuite; sh ../debian/tests/blis-testsuite.sh blis-serial
+Restrictions: allow-stderr,
+Depends: libblis-serial-dev, build-essential,
+Features: test-name=blis32-serial-test
+
+Test-Command: cd testsuite; sh ../debian/tests/blis-testsuite.sh blis64-openmp
+Restrictions: allow-stderr,
+Depends: libblis64-openmp-dev, build-essential,
+Features: test-name=blis64-openmp-test
+
+Test-Command: cd testsuite; sh ../debian/tests/blis-testsuite.sh blis64-pthread
+Restrictions: allow-stderr,
+Depends: libblis64-pthread-dev, build-essential,
+Features: test-name=blis64-pthread-test
+
+Test-Command: cd testsuite; sh ../debian/tests/blis-testsuite.sh blis64-serial
+Restrictions: allow-stderr,
+Depends: libblis64-serial-dev, build-essential,
+Features: test-name=blis64-serial-test
+
+# ---------------- installation / maintainer script tests ---------------------
+
+Test-Command: apt-get purge libblis-dev libblis-openmp-dev libblis-pthread-dev libblis-serial-dev -y
+Restrictions: needs-root,
+Depends: libblis-dev, libblis-openmp-dev, libblis-pthread-dev, libblis-serial-dev,
+Features: test-name=blis32_maintscript
+
+Test-Command: apt-get purge libblis64-dev libblis64-openmp-dev libblis64-pthread-dev libblis64-serial-dev -y
+Restrictions: needs-root,
+Depends: libblis64-dev, libblis64-openmp-dev, libblis64-pthread-dev, libblis64-serial-dev,
+Features: test-name=blis64_maintscript

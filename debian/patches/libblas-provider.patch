@@ -1,0 +1,12 @@
+Build a libblas.so.3 shared object.
+
+--- a/Makefile
++++ b/Makefile
+@@ -667,6 +667,7 @@
+ 	@$(LINKER) $(SOFLAGS) -o $(LIBBLIS_SO_OUTPUT_NAME) $^ $(LDFLAGS)
+ endif
+ endif
++	$(LINKER) $(SOFLAGS) -o $(BASE_LIB_PATH)/$(DEB_LIBBLAS) $? $(LDFLAGS) -Wl,--soname,$(DEB_LIBBLAS) -Wl,--version-script=debian/version_script.lds
+ 
+ # Local symlink for shared library.
+ # NOTE: We use a '.loc' suffix to avoid filename collisions in case this

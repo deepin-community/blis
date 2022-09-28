@@ -1,0 +1,7 @@
+Document: blis64
+Title: BLIS Documentation
+Author: BLIS Authors
+Section: Science/Mathematics
+
+Format: Text
+Files: /usr/share/doc/libblis64-dev/*.md.gz

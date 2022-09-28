@@ -1,0 +1,3 @@
+# Intentional
+symbols-declares-dependency-on-other-package
+package-has-unnecessary-activation-of-ldconfig-trigger

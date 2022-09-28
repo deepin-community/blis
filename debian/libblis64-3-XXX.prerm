@@ -1,0 +1,16 @@
+#!/bin/sh
+set -e
+. /usr/share/debconf/confmodule
+
+if [ "$1" != "upgrade" ]; then
+
+    update-alternatives --remove libblis64.so.@SOVER@-@DEB_HOST_MULTIARCH@ \
+                        /usr/lib/@DEB_HOST_MULTIARCH@/@SUBDIR@/libblis64.so.@SOVER@
+
+    update-alternatives --remove libblas64.so.3-@DEB_HOST_MULTIARCH@ \
+                        /usr/lib/@DEB_HOST_MULTIARCH@/@SUBDIR@/libblas64.so.3
+
+fi
+
+#DEBHELPER#
+exit 0
